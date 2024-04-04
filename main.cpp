@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
 
 				rcvpacket += sizeof(struct EthHdr);
 				arp_hdr = (PArpHdr)rcvpacket;
-				if(arp_hdr->sip().operator uint32_t()==Ip(argv[2 * i]).operator uint32_t()) break;
+				if (static_cast<uint32_t>(arp_hdr->sip()) == static_cast<uint32_t>(Ip(argv[2 * i]))) break;
 			}
 		}
 		Mac victim_mac = arp_hdr->smac();
